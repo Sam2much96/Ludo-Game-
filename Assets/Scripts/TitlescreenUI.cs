@@ -5,6 +5,10 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
+
+//System IO for loading and Saving wallet Data
+using System.IO;
+
 //Game UI template
 
 public class TitlescreenUI : MonoBehaviour
@@ -16,10 +20,27 @@ public class TitlescreenUI : MonoBehaviour
     public Button QuitButton;
 
     public bool isGameActive;
+    
+    //for saving and loading Local highscores data
+    private string saveFile; 
     void Start()
     {
         //shows UI
         titleScreen.gameObject.SetActive(true);
+
+        //loads local highscore .json 
+        saveFile = UnityEngine.Application.persistentDataPath + "/highscore.json"; 
+
+
+        if (File.Exists(saveFile) == false)
+        {
+            //Saves Score Info
+            SaveHighScore(string.Format("Highscore: "+ 0));
+
+        }
+
+        if (File.Exists(saveFile) == true) {LoadHighscore();}
+
 
 
     }
@@ -46,9 +67,17 @@ public class TitlescreenUI : MonoBehaviour
         hide();
     }
 
+    //Logs to Highscore variable to console
     void  Highscores()
     {
-        Debug.Log("Show Highscores");
+        if (loaded_highscore != "")
+        {
+            Debug.Log("Highscore: "+ loaded_highscore );
+        }
+        if (loaded_highscore == "")
+        {
+            Debug.Log("Highscore: 0");
+        }
     }
 
     //hides the UI object
@@ -67,4 +96,30 @@ public class TitlescreenUI : MonoBehaviour
         //game quiter
         Application.Quit();
     }
+
+    public void SaveHighScore(string Highscores )
+    {
+        File.WriteAllText(saveFile, Highscores.ToString());
+
+    }
+
+    
+    //loads Highscore from local storage
+    public string loaded_highscore ;
+    public void LoadHighscore()
+    {   //check if files exist
+        if (File.Exists(saveFile))
+        {
+            // Read the Entire file and save its contents
+            string fileContents = File.ReadAllText(saveFile);
+
+            //Print Account Details
+            Debug.Log(fileContents.ToString());
+
+            //loads account info to a variable
+            loaded_highscore = fileContents;
+
+        }
+    }
+
 }
