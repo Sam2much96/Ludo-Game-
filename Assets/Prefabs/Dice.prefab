@@ -321,7 +321,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rb: {fileID: 1671134104350354596}
-  dieSound: {fileID: 0}
   faces:
   - {fileID: 1595004200}
   - {fileID: 2016087539}

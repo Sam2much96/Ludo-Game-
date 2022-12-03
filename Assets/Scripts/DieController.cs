@@ -4,44 +4,101 @@ using UnityEngine;
 
 public class DieController : MonoBehaviour
 {
-    private float minRange = 18.0f;
-    private float maxRange = 22.0f;
-    private float minTorqueAngle = 0;
-    private float maxTorqueAngle = 45.0f;
-    private bool canSpin = true;
+    // Torque values
+    private float upwardMagForce = 5.0f;
+    private float minSpeed = 8.0f;
+    private float minAngle = 4.0f;
+    private float maxAngle = 5.0f;
+
+    // Some useful components of the die gameobject
     public Rigidbody rb;
-    public AudioSource dieSound;
+    private AudioSource[] sounds;
+    private AudioSource dieSound;
+    private AudioSource dieSound1;
     public GameObject[] faces;
+
+    // Volume variables
+    private float lastHeight;
+    private float maxHeight = 1.0f;
+
+    // Roll values
+    public bool hasRolled;
+    public int rollCount = 0;
+    public int minRollCount = 1;
+    public int maxRollCount = 3;
+    public int defaultRollCount = 0;
+
+    private void Awake()
+    {
+        sounds = GameObject.Find("Main Camera").GetComponents<AudioSource>();
+        dieSound = sounds[0];
+        dieSound1 = sounds[1];
+    }
 
     // Start is called before the first frame update
     void Start()
     {
-        
+        lastHeight = maxHeight;
     }
 
     // Update is called once per frame
     void Update()
     {
-        Debug.Log(NumberOnDie());
-        if (canSpin)
+        if (lastHeight < transform.position.y)
         {
-            Spin();
+            lastHeight = transform.position.y;
         }
+
     }
 
     private void Spin()
     {
-        float torqueSpeed = Random.Range(minRange, maxRange);
-        Vector3 torque = new Vector3(Random.Range(minTorqueAngle, maxTorqueAngle), Random.Range(minTorqueAngle, maxTorqueAngle), Random.Range(minTorqueAngle, maxTorqueAngle));
+        Vector3 upwardForce = Vector3.up * upwardMagForce;
+        rb.AddForce(upwardForce, ForceMode.Impulse);
+        StartCoroutine(TimeToSpin());
+    }
+
+    IEnumerator TimeToSpin()
+    {
+        // For performing spin on die after some time it leaves the ground
+        yield return new WaitForSeconds(0.1f);
+        float torqueSpeed = minSpeed + rollCount;
+        Vector3 torque = new Vector3(RandomValues(minAngle, maxAngle), RandomValues(minAngle, maxAngle), RandomValues(minAngle, maxAngle));
         rb.AddTorque(torque * torqueSpeed * Time.deltaTime, ForceMode.Impulse);
+    }
+
+    private float RandomValues(float min, float max)
+    {
+        // For returning random values
+        return Random.Range(min, max);
     }
 
     private void OnCollisionEnter(Collision collision)
     {
         if(collision.gameObject.CompareTag("Ludo Board"))
+        {
+            // Sound the die makes
+            dieSound.volume = lastHeight / maxHeight;
             dieSound.Play();
+            lastHeight = 0;
+            hasRolled = true;
+        }
 
-        canSpin = false;
+        if (collision.gameObject.CompareTag("Frame"))
+        {
+            dieSound1.Play();
+            hasRolled = true;
+        }
+    }
+
+    private void OnMouseDown()
+    {
+        if (hasRolled || rollCount >= maxRollCount) // test
+            return;
+
+        // Activate die spin mechanism
+        Spin();
+        rollCount++; // test
     }
 
     public int NumberOnDie()
