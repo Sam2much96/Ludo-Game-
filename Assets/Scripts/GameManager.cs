@@ -278,4 +278,11 @@ public class GameManager : MonoBehaviour
         die.transform.position = new Vector3(0, die.transform.position.y);
     }
 
+    public void DoSomething()
+    {
+        Debug.Log(" Testing UI and GameManager Integration ");
+
+
+    }
+
 }

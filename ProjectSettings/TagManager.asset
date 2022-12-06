@@ -11,6 +11,7 @@ TagManager:
   - Yellow
   - Green
   - Blue
+  - GameManager
   layers:
   - Default
   - TransparentFX

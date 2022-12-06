@@ -23,8 +23,23 @@ public class TitlescreenUI : MonoBehaviour
     
     //for saving and loading Local highscores data
     private string saveFile; 
+    public GameManager GameManagerX;
+    
+    void loadGameManager()
+    {
+        //get the game manager
+        
+        GameManagerX = GameObject.FindWithTag("GameManager").GetComponent<GameManager>();
+        GameManagerX.DoSomething();
+
+    }
+
+
     void Start()
     {
+        
+        loadGameManager();
+
         //shows UI
         titleScreen.gameObject.SetActive(true);
 
